@@ -39,10 +39,6 @@ menu = """
 <br>
 """
 
-@app.route("/email")
-def contato():
-  return menu + "Essa página para o email das cotações das moedas"
-
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -281,7 +277,7 @@ libra_processo()
 
 # Rota para o webhook
 @app.route("/email")
-def contato():
+def email():
   return menu + "Essa página para o email das cotações das moedas"
 
 
