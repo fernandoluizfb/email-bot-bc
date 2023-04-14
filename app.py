@@ -277,15 +277,22 @@ libra_processo()
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
          
+@app.route("/email")
+def email():
+  enviar_email()
+  return f"Mensagem enviada. Resposta ({resposta.status_code}): {resposta.text}"
+  
+ ###Configurando o bot no Telegram em webhook
+
 def enviar_email():
     data_atual = Date.today()
     corpo_email = f"""
         <b>Olá, Boa noite. Eu sou uma versão do <a href="https://web.telegram.org/z/#6252592956">@dados_do_bc_bot.</a><br>Se você recebeu esse email, é porque está inscrito para ter acesso à cotação diária de diferentes moedas.</b>
-        <br><br>Aqui vai algumas das notícias de hoje:\
-        <br><br>{dolar_processo()}\
-        <br><br>{euro_processo()}\
-        <br><br>{dolar_canadense_processo()}\
-        <br><br>{libra_processo()}\
+        <br><br>Veja as notícias de hoje:\
+        <br><br>{dolar_processo()} Analistas apontam que fatores externos, como a variação dos preços das commodities e a instabilidade política em outros países, podem influenciar no comportamento da moeda americana.\   
+        <br><br>{euro_processo()}Nos últimos dias, o euro tem se comportado de forma bastante volátil, acompanhando as oscilações do mercado financeiro global.\
+        <br><br>{dolar_canadense_processo()} Esse movimento pode ser atribuído a diversos fatores, como a oscilação das moedas internacionais e as decisões político-econômicas vindas de Ottawa. \
+        <br><br>{libra_processo()}Essas variações podem ser influenciadas por diversos fatores, como a economia global e o cenário político nos países do Velho Continente.\
         """
 
     message = EmailMessage()
@@ -302,7 +309,17 @@ def enviar_email():
     s.login(message['From'], password)
     s.sendmail(message['From'], [message['To']], message.as_string().encode('utf-8'))
     s.quit()
+
+@app.route('/webhook', methods=['POST'])
+def process_webhook():
+    data = request.json
     
-    resposta = f"Mensagem enviada. Resposta ({resposta.status_code}): {resposta.text}"
-    return resposta
+    # Chama a função de envio de e-mail quando receber um webhook
+    enviar_email()
+    
+    return 'Webhook recebido com sucesso.'
+
+if __name__ == '__main__':
+    app.run()
+    
 
