@@ -16,6 +16,7 @@ from tchan import ChannelScraper
 from bcb import sgs
 from datetime import datetime, date
 from datetime import date, timedelta
+from datetime import date as Date
 
 
 
