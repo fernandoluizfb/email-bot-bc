@@ -293,7 +293,7 @@ def enviar_email():
         <br><br>{libra_processo()}\
         """
 
-    message = email.message.Message()
+    message = EmailMessage()
     message['Subject'] = "Cotações Econômicas"
     message['From'] = 'fernandoluizfb@gmail.com'
     message['To'] = 'fernandoluizfb@gmail.com'
