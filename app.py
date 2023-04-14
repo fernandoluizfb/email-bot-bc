@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import smtplib
 import email.message
 import datetime
+import base64
 
 from flask import Flask, request
 from oauth2client.service_account import ServiceAccountCredentials
@@ -317,14 +318,6 @@ def plot_dolar_variacao_semanal(dolar_ptax_df):
     # Exibe o gráfico
     plt.show()
 
-# Abre o arquivo de imagem
-with open('dolar_variacao_semanal.png', 'rb') as f:
-    img_data = f.read()
-
-# Cria um objeto de imagem a partir dos dados
-img = Image.open(BytesIO(img_data))
-
-
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -337,7 +330,16 @@ def email():
  ###Configurando o bot no Telegram em webhook
 
 def enviar_email():
-    data_atual = Date.today()
+    data_atual = Date.today()   
+        # Carrega a imagem como um objeto de imagem PIL
+    with open('dolar_variacao_semanal.png', 'rb') as f:
+        img = Image.open(f)       
+    # Converte a imagem em uma string codificada em base64
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    img_str = base64.b64encode(buffer.getvalue()).decode()
+    
+    
     corpo_email = f"""
         <b>Olá, Boa noite. Eu sou uma versão do <a href="https://web.telegram.org/z/#6252592956">@dados_do_bc_bot.</a><br>Se você recebeu esse email, é porque está inscrito para ter acesso à cotação diária de diferentes moedas.</b>
         <br><br>Aqui vai algumas das notícias de hoje:\
