@@ -10,5 +10,4 @@ numpy
 datetime
 python-telegram-bot==13.9
 matplotlib
-email.message
 smtplib
