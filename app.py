@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import smtplib
 import email.message
 import datetime
-import base64
 
 from flask import Flask, request
 from oauth2client.service_account import ServiceAccountCredentials
@@ -318,6 +317,14 @@ def plot_dolar_variacao_semanal(dolar_ptax_df):
     # Exibe o gráfico
     plt.show()
 
+# Abre o arquivo de imagem
+with open('dolar_variacao_semanal.png', 'rb') as f:
+    img_data = f.read()
+
+# Cria um objeto de imagem a partir dos dados
+img = Image.open(BytesIO(img_data))
+
+
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -329,35 +336,25 @@ def email():
   
  ###Configurando o bot no Telegram em webhook
 
-from email.mime.multipart import MIMEMultipart
-from email.mime.image import MIMEImage
-
 def enviar_email():
     data_atual = Date.today()
     corpo_email = f"""
         <b>Olá, Boa noite. Eu sou uma versão do <a href="https://web.telegram.org/z/#6252592956">@dados_do_bc_bot.</a><br>Se você recebeu esse email, é porque está inscrito para ter acesso à cotação diária de diferentes moedas.</b>
         <br><br>Aqui vai algumas das notícias de hoje:\
         <br><br>{dolar_processo()}\
-        <br><br><img src="cid:dolar_variacao_semanal.png">
-
+        <br><br> <p><img src="data:image/png;base64,{img_data}" /></p>      
         <br><br>{euro_processo()}\
         <br><br>{dolar_canadense_processo()}\
         <br><br>{libra_processo()}\
         """
 
-    message = MIMEMultipart()
+    message = EmailMessage()
     message['Subject'] = "Cotações Econômicas"
     message['From'] = 'fernandoluizfb@gmail.com'
     message['To'] = 'fernandoluizfb@gmail.com'
     password = os.environ.get('EMAIL_KEY_FILE')
-    message.attach(MIMEText(corpo_email, 'html'))
-    
-    # Adiciona a imagem como anexo
-    with open('dolar_variacao_semanal.png', 'rb') as f:
-        img_data = f.read()
-        image = MIMEImage(img_data)
-        image.add_header('Content-ID', '<dolar_variacao_semanal>')
-        message.attach(image)
+    message.add_header('Content-Type', 'text/html')
+    message.set_payload(corpo_email)
 
     s = smtplib.SMTP('smtp.gmail.com: 587')
     s.starttls()
@@ -365,7 +362,6 @@ def enviar_email():
     s.login(message['From'], password)
     s.sendmail(message['From'], [message['To']], message.as_string().encode('utf-8'))
     s.quit()
-
 
 @app.route('/webhook', methods=['POST'])
 def process_webhook():
@@ -378,9 +374,3 @@ def process_webhook():
 
 if __name__ == '__main__':
     app.run()
-    
-
-
-
-
-
