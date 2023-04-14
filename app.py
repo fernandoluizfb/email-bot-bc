@@ -275,12 +275,6 @@ libra_processo()
 
  ###Configurando o bot no Telegram em webhook
 
-# Rota para o webhook
-@app.route("/email")
-def email():
-  return menu + "Essa página para o email das cotações das moedas"
-
-
 def enviar_email():
     data_atual = datetime.date.today()
     corpo_email = f"""
@@ -318,4 +312,10 @@ def process_webhook():
 
 if __name__ == '__main__':
     app.run()
+    
+@app.route("/email")
+def email():
+  enviar_email()
+  return "Email enviado com sucesso!"
+
 
