@@ -329,34 +329,35 @@ def email():
   
  ###Configurando o bot no Telegram em webhook
 
+from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
+
 def enviar_email():
-    data_atual = Date.today()   
-        # Carrega a imagem como um objeto de imagem PIL
-    with open('dolar_variacao_semanal.png', 'rb') as f:
-        img = Image.open(f)       
-    # Converte a imagem em uma string codificada em base64
-    buffer = BytesIO()
-    img.save(buffer, format='PNG')
-    img_str = base64.b64encode(buffer.getvalue()).decode()
-    
-    
+    data_atual = Date.today()
     corpo_email = f"""
         <b>Olá, Boa noite. Eu sou uma versão do <a href="https://web.telegram.org/z/#6252592956">@dados_do_bc_bot.</a><br>Se você recebeu esse email, é porque está inscrito para ter acesso à cotação diária de diferentes moedas.</b>
         <br><br>Aqui vai algumas das notícias de hoje:\
         <br><br>{dolar_processo()}\
-        <br><br> <p><img src="data:image/png;base64,{img_data}" /></p>      
+        <br><br><img src="cid:dolar_variacao_semanal.png">
+
         <br><br>{euro_processo()}\
         <br><br>{dolar_canadense_processo()}\
         <br><br>{libra_processo()}\
         """
 
-    message = EmailMessage()
+    message = MIMEMultipart()
     message['Subject'] = "Cotações Econômicas"
     message['From'] = 'fernandoluizfb@gmail.com'
     message['To'] = 'fernandoluizfb@gmail.com'
     password = os.environ.get('EMAIL_KEY_FILE')
-    message.add_header('Content-Type', 'text/html')
-    message.set_payload(corpo_email)
+    message.attach(MIMEText(corpo_email, 'html'))
+    
+    # Adiciona a imagem como anexo
+    with open('dolar_variacao_semanal.png', 'rb') as f:
+        img_data = f.read()
+        image = MIMEImage(img_data)
+        image.add_header('Content-ID', '<dolar_variacao_semanal>')
+        message.attach(image)
 
     s = smtplib.SMTP('smtp.gmail.com: 587')
     s.starttls()
@@ -364,6 +365,7 @@ def enviar_email():
     s.login(message['From'], password)
     s.sendmail(message['From'], [message['To']], message.as_string().encode('utf-8'))
     s.quit()
+
 
 @app.route('/webhook', methods=['POST'])
 def process_webhook():
