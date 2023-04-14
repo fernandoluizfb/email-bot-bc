@@ -6,7 +6,6 @@ import requests
 import telegram
 import matplotlib.pyplot as plt
 import smtplib
-import email.message
 
 from flask import Flask, request
 from oauth2client.service_account import ServiceAccountCredentials
