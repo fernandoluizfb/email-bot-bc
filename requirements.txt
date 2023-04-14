@@ -1,5 +1,4 @@
 Flask==2.0.1
-flask_cors
 gunicorn==20.1.0
 tchan
 requests
@@ -10,4 +9,6 @@ python-bcb
 numpy
 datetime
 python-telegram-bot==13.9
-telegram
+matplotlib
+email.message
+smtplib
