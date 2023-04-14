@@ -4,6 +4,9 @@ import gspread
 import pandas as pd
 import requests
 import telegram
+import matplotlib.pyplot as plt
+import smtplib
+import email.message
 
 from flask import Flask, request
 from oauth2client.service_account import ServiceAccountCredentials
@@ -16,9 +19,7 @@ from datetime import date, timedelta
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #Configurando informações sensíveis de forma segura
-
-TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
-TELEGRAM_ADMIN_ID = os.environ["TELEGRAM_ADMIN_ID"]
+EMAIL_KEY_FILE = os.environ["EMAIL_KEY_FILE"]
 GOOGLE_SHEETS_CREDENTIALS = os.environ["GOOGLE_SHEETS_CREDENTIALS"]
 with open("credenciais.json", mode="w") as arquivo:
   arquivo.write(GOOGLE_SHEETS_CREDENTIALS)
@@ -33,35 +34,15 @@ app = Flask(__name__)
 def hello_world():
   return menu + "Olá! Eu sou um robô que compila e automatiza dados do Banco Central"
 
-###Recebendo aviso de nova mensagem
-@app.route("/novamensagem")
-def novamensagem():
-  mensagem = {"chat_id": TELEGRAM_ADMIN_ID, "text": "Um novo usuário acessou o Robô de Dados do Banco Central"}
-  requests.post(f"https://api.telegram.org/bot{TELEGRAM_API_KEY}/sendMessage", data=mensagem)
-  return "Mensagem enviada."
-
 menu = """
-<a href="/">Página inicial</a> | <a href="/sobre">Sobre</a> | <a href="/contato">Contato</a> | <a href="/dedoduro2">dedoduro2</a>
+<a href="/">Página inicial</a> | <a href="/sobre">Sobre</a> | <a href="/contato">Contato</a> | <a href="/dedoduro2">dedoduro2</a> | <a href="/email">Email</a>
 <br>
 """
 
-@app.route("/")
-def index():
-  return menu + "Olá, mundo! Esse é meu site. (Fernando Barbosa)"
-
-@app.route("/sobre")
-def sobre():
-  return menu + "Aqui vai o conteúdo da página Sobre"
-
-@app.route("/contato")
+@app.route("/email")
 def contato():
-  return menu + "Aqui vai o conteúdo da página Contato"
+  return menu + "Essa página para o email das cotações das moedas"
 
-@app.route("/dedoduro2")
-def dedoduro2():
-  mensagem = {"chat_id": TELEGRAM_ADMIN_ID, "text": "Alguém acessou o bot do Banco Central!"}
-  resposta = requests.post(f"https://api.telegram.org/bot{TELEGRAM_API_KEY}/sendMessage", data=mensagem)
-  return f"Mensagem enviada. Resposta ({resposta.status_code}): {resposta.text}"
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -299,35 +280,46 @@ libra_processo()
  ###Configurando o bot no Telegram em webhook
 
 # Rota para o webhook
-@app.route("/telegram-bot", methods=["POST"])
-def telegram_bot():
-    update = request.get_json()
-    chat_id = update["message"]["chat"]["id"]
-    message = update["message"]["text"]
-    if message == "/start":
-        texto_resposta = "Olá! Seja bem-vindo(a).\n\nSou um robô criado no curso de Jornalismo de Dados do Insper para mostrar informações econômicas.\n\nVocê gostaria de saber sobre dólar, euro, libra ou dólar canadense?\n\nPressione '1' para dólar, '2' para euro, '3' para a libra e '4' para dólar canadense"
-    elif message == "1":
-        texto_resposta = dolar_processo()
-    elif message == "2":
-        texto_resposta = euro_processo()  
-    elif message == "3":
-        texto_resposta = libra_processo()  
-    elif message == "4":
-        texto_resposta = dolar_canadense_processo()       
-    else:
-        texto_resposta = "Desculpe, não entendi."
+@app.route("/email")
+def contato():
+  return menu + "Essa página para o email das cotações das moedas"
+
+
+def enviar_email():
+    data_atual = datetime.date.today()
+    corpo_email = f"""
+        <b>Olá, Boa noite. Eu sou uma versão do <a href="https://web.telegram.org/z/#6252592956">@dados_do_bc_bot.</a><br>Se você recebeu esse email, é porque está inscrito para ter acesso à cotação diária de diferentes moedas.</b>
+        <br><br>Aqui vai algumas das notícias de hoje:\
+        <br><br>{dolar_processo()}\
+        <br><br>{euro_processo()}\
+        <br><br>{dolar_canadense_processo()}\
+        <br><br>{libra_processo()}\
+        """
+
+    msg = email.message.Message()
+    msg['Subject'] = "Cotações Econômicas"
+    msg['From'] = 'fernandoluizfb@gmail.com'
+    msg['To'] = 'fernandoluizfb@gmail.com'
+    password = os.environ.get('EMAIL_KEY_FILE')
+    msg.add_header('Content-Type', 'text/html')
+    msg.set_payload(corpo_email)
+
+    s = smtplib.SMTP('smtp.gmail.com: 587')
+    s.starttls()
+    # Login Credentials for sending the mail
+    s.login(msg['From'], password)
+    s.sendmail(msg['From'], [msg['To']], msg.as_string().encode('utf-8'))
+    s.quit()
+
+@app.route('/webhook', methods=['POST'])
+def process_webhook():
+    data = request.json
     
-    # envie a mensagem de resposta para o Telegram
-    data = {
-        "chat_id": chat_id,
-        "text": texto_resposta,
-        "parse_mode": "HTML"
-    }
-    url = f"https://api.telegram.org/bot{TELEGRAM_API_KEY}/sendMessage"
-    response = requests.post(url, data=data)
-    print(response.json())
+    # Chama a função de envio de e-mail quando receber um webhook
+    enviar_email()
+    
+    return 'Webhook recebido com sucesso.'
 
-    return "ok"
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run()
+
