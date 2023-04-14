@@ -272,7 +272,11 @@ libra_processo()
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
          
-
+@app.route("/email")
+def email():
+  enviar_email()
+  return f"Mensagem enviada. Resposta ({resposta.status_code}): {resposta.text}"
+  
  ###Configurando o bot no Telegram em webhook
 
 def enviar_email():
@@ -313,9 +317,6 @@ def process_webhook():
 if __name__ == '__main__':
     app.run()
     
-@app.route("/email")
-def email():
-  enviar_email()
-  return "Email enviado com sucesso!"
+
 
 
