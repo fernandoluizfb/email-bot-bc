@@ -1,5 +1,4 @@
 import os
-import io
 
 import gspread
 import pandas as pd
@@ -19,8 +18,6 @@ from datetime import datetime, date
 from datetime import date, timedelta
 from datetime import date as Date
 from email.message import EmailMessage
-from PIL import Image
-from io import BytesIO
 
 
 
@@ -279,72 +276,16 @@ libra_processo()
 
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#Gráfico Dólar
-
-def plot_dolar_variacao_semanal(dolar_ptax_df):
-    # Ordena o dataframe pela coluna 'Date' em ordem crescente
-    dolar_ptax_df = dolar_ptax_df.sort_values(by='Date', ascending=True)
-
-    # Extrai as informações relevantes do dataframe na nova ordem
-    datas = list(reversed(pd.to_datetime(dolar_ptax_df['Date']).dt.strftime('%d/%m/%Y')))
-    dolar = list(reversed(dolar_ptax_df['Dólar']))
-
-    # Define a escala de cores em tons de verde
-    color_scale = ['#0B5345', '#117A65', '#1ABC9C', '#48C9B0', '#A3E4D7']
-
-    # Define o tamanho da figura
-    plt.figure(figsize=(10, 5))
-
-    # Plota o gráfico de barras
-    plt.bar(datas, dolar, color=color_scale, width=0.8)
-
-    # Adiciona título e rótulos dos eixos
-    plt.title('A variação semanal do dólar')
-    plt.xlabel('')
-    plt.ylabel('Valor do dólar (R$)')
-
-    # Adiciona etiquetas com os valores de cada barra
-    for i in range(len(dolar)):
-        plt.text(x=i, y=dolar[i]-0.3, s=str(dolar[i]), ha='center')
-
-    # Diminui o tamanho das datas abaixo das colunas
-    plt.xticks(rotation=25, fontsize=8.5)
-
-    # Salva o gráfico em uma imagem
-    plt.savefig('dolar_variacao_semanal.png', dpi=300, bbox_inches='tight')
-
-    # Exibe o gráfico
-    plt.show()
-
-# Abre o arquivo de imagem
-with open('dolar_variacao_semanal.png', 'rb') as f:
-    img_data = f.read()
-
-# Cria um objeto de imagem a partir dos dados
-img = Image.open(BytesIO(img_data))
-
-
-
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-@app.route("/email")
-def email():
-  enviar_email()
-  return f"Mensagem enviada. Resposta ({resposta.status_code}): {resposta.text}"
-  
- ###Configurando o bot no Telegram em webhook
-
+         
 def enviar_email():
     data_atual = Date.today()
     corpo_email = f"""
         <b>Olá, Boa noite. Eu sou uma versão do <a href="https://web.telegram.org/z/#6252592956">@dados_do_bc_bot.</a><br>Se você recebeu esse email, é porque está inscrito para ter acesso à cotação diária de diferentes moedas.</b>
-        <br><br>Veja as notícias de hoje:\
-        <br><br>{dolar_processo()} Analistas apontam que fatores externos, como a variação dos preços das commodities e a instabilidade política em outros países, podem influenciar no comportamento da moeda americana.\   
-        <br><br>{euro_processo()}Nos últimos dias, o euro tem se comportado de forma bastante volátil, acompanhando as oscilações do mercado financeiro global.\
-        <br><br>{dolar_canadense_processo()} Esse movimento pode ser atribuído a diversos fatores, como a oscilação das moedas internacionais e as decisões político-econômicas vindas de Ottawa. \
-        <br><br>{libra_processo()}Essas variações podem ser influenciadas por diversos fatores, como a economia global e o cenário político nos países do Velho Continente.\
+        <br><br>Aqui vai algumas das notícias de hoje:\
+        <br><br>{dolar_processo()}\
+        <br><br>{euro_processo()}\
+        <br><br>{dolar_canadense_processo()}\
+        <br><br>{libra_processo()}\
         """
 
     message = EmailMessage()
@@ -361,15 +302,7 @@ def enviar_email():
     s.login(message['From'], password)
     s.sendmail(message['From'], [message['To']], message.as_string().encode('utf-8'))
     s.quit()
-
-@app.route('/webhook', methods=['POST'])
-def process_webhook():
-    data = request.json
     
-    # Chama a função de envio de e-mail quando receber um webhook
-    enviar_email()
-    
-    return 'Webhook recebido com sucesso.'
+    resposta = f"Mensagem enviada. Resposta ({resposta.status_code}): {resposta.text}"
+    return resposta
 
-if __name__ == '__main__':
-    app.run()
