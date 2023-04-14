@@ -284,7 +284,7 @@ def email():
  ###Configurando o bot no Telegram em webhook
 
 def enviar_email():
-    data_atual = Date.Today()
+    data_atual = Date.today()
     corpo_email = f"""
         <b>Olá, Boa noite. Eu sou uma versão do <a href="https://web.telegram.org/z/#6252592956">@dados_do_bc_bot.</a><br>Se você recebeu esse email, é porque está inscrito para ter acesso à cotação diária de diferentes moedas.</b>
         <br><br>Veja as notícias de hoje:\
@@ -294,7 +294,7 @@ def enviar_email():
         <br><br>{libra_processo()}Essas variações podem ser influenciadas por diversos fatores, como a economia global e o cenário político nos países do Velho Continente.\
         """
 
-    message = email.message.Message()
+    message = EmailMessage()
     message['Subject'] = "Cotações Econômicas"
     message['From'] = 'fernandoluizfb@gmail.com'
     message['To'] = 'fernandoluizfb@gmail.com'
