@@ -6,6 +6,7 @@ import requests
 import telegram
 import matplotlib.pyplot as plt
 import smtplib
+import email.message
 
 from flask import Flask, request
 from oauth2client.service_account import ServiceAccountCredentials
@@ -295,19 +296,19 @@ def enviar_email():
         <br><br>{libra_processo()}\
         """
 
-    msg = email.message.Message()
-    msg['Subject'] = "Cotações Econômicas"
-    msg['From'] = 'fernandoluizfb@gmail.com'
-    msg['To'] = 'fernandoluizfb@gmail.com'
+    message = email.message.Message()
+    message['Subject'] = "Cotações Econômicas"
+    message['From'] = 'fernandoluizfb@gmail.com'
+    message['To'] = 'fernandoluizfb@gmail.com'
     password = os.environ.get('EMAIL_KEY_FILE')
-    msg.add_header('Content-Type', 'text/html')
-    msg.set_payload(corpo_email)
+    message.add_header('Content-Type', 'text/html')
+    message.set_payload(corpo_email)
 
     s = smtplib.SMTP('smtp.gmail.com: 587')
     s.starttls()
     # Login Credentials for sending the mail
-    s.login(msg['From'], password)
-    s.sendmail(msg['From'], [msg['To']], msg.as_string().encode('utf-8'))
+    s.login(message['From'], password)
+    s.sendmail(message['From'], [message['To']], message.as_string().encode('utf-8'))
     s.quit()
 
 @app.route('/webhook', methods=['POST'])
