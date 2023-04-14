@@ -16,6 +16,8 @@ from tchan import ChannelScraper
 from bcb import sgs
 from datetime import datetime, date
 from datetime import date, timedelta
+from datetime import date as Date
+
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -281,7 +283,7 @@ def email():
  ###Configurando o bot no Telegram em webhook
 
 def enviar_email():
-    data_atual = datetime.date.today()
+    data_atual = Date.today()
     corpo_email = f"""
         <b>Olá, Boa noite. Eu sou uma versão do <a href="https://web.telegram.org/z/#6252592956">@dados_do_bc_bot.</a><br>Se você recebeu esse email, é porque está inscrito para ter acesso à cotação diária de diferentes moedas.</b>
         <br><br>Aqui vai algumas das notícias de hoje:\
