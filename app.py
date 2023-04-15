@@ -17,6 +17,7 @@ from bcb import sgs
 from datetime import datetime, date
 from datetime import date, timedelta
 from datetime import date as Date
+from email.message import EmailMessage
 
 
 
