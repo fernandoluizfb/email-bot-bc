@@ -289,10 +289,10 @@ def enviar_email():
     corpo_email = f"""
         <b>Olá, Boa noite. Eu sou uma versão do <a href="https://web.telegram.org/z/#6252592956">@dados_do_bc_bot.</a><br>Se você recebeu esse email, é porque está inscrito para ter acesso à cotação diária de diferentes moedas.</b>
         <br><br>Veja as notícias de hoje:\
-        <br><br>{dolar_processo()}. Analistas apontam que fatores externos, como a variação dos preços das commodities e a instabilidade política em outros países, podem influenciar no comportamento da moeda americana.&#128184    
-        <br><br>{euro_processo()}. Nos últimos dias, o euro tem se comportado de forma bastante volátil, acompanhando as oscilações do mercado financeiro global.&#128182\
-        <br><br>{dolar_canadense_processo()}. Esse movimento pode ser atribuído a diversos fatores, como a oscilação das moedas internacionais e as decisões político-econômicas vindas de Ottawa.&#128176\
-        <br><br>{libra_processo()}. Essas variações podem ser influenciadas por diversos fatores, como a economia global e o cenário político nos países do Velho Continente.&#128178\
+        <br><br>{dolar_processo()}. Analistas apontam que fatores externos, como a variação dos preços das commodities e a instabilidade política em outros países, podem influenciar no comportamento da moeda americana.    
+        <br><br>{euro_processo()}. Nos últimos dias, o euro tem se comportado de forma bastante volátil, acompanhando as oscilações do mercado financeiro global.\
+        <br><br>{dolar_canadense_processo()}. Esse movimento pode ser atribuído a diversos fatores, como a oscilação das moedas internacionais e as decisões político-econômicas vindas de Ottawa.\
+        <br><br>{libra_processo()}. Essas variações podem ser influenciadas por diversos fatores, como a economia global e o cenário político nos países do Velho Continente.\
         """
 
     message = EmailMessage()
